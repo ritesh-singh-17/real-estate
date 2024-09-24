@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie'
 
 export default function Contact({ listing }) {
   const [landlord, setLandlord] = useState(null);
@@ -10,8 +11,14 @@ export default function Contact({ listing }) {
 
   useEffect(() => {
     const fetchLandlord = async () => {
+      const token = Cookies.get("access_token")
       try {
-        const res = await fetch(`https://real-estate-gxtg.onrender.com/api/user/${listing.userRef}`);
+        const res = await fetch(`https://real-estate-gxtg.onrender.com/api/user/${listing.userRef}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         const data = await res.json();
         setLandlord(data);
       } catch (error) {
@@ -40,10 +47,10 @@ export default function Contact({ listing }) {
           ></textarea>
 
           <Link
-          to={`mailto:${landlord.email}?subject=Regarding ${listing.name}&body=${message}`}
-          className='bg-slate-700 text-white text-center p-3 uppercase rounded-lg hover:opacity-95'
+            to={`mailto:${landlord.email}?subject=Regarding ${listing.name}&body=${message}`}
+            className='bg-slate-700 text-white text-center p-3 uppercase rounded-lg hover:opacity-95'
           >
-            Send Message          
+            Send Message
           </Link>
         </div>
       )}

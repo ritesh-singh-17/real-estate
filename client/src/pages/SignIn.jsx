@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import Cookies from 'js-cookie'
 import {
   signInStart,
   signInSuccess,
@@ -36,7 +37,8 @@ export default function SignIn() {
         dispatch(signInFailure(data.message));
         return;
       }
-      dispatch(signInSuccess(data));
+      dispatch(signInSuccess(data.user));
+      Cookies.set('access_token', data.token)
       navigate('/');
     } catch (error) {
       dispatch(signInFailure(error.message));

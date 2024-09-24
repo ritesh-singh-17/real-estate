@@ -8,6 +8,7 @@ import {
 import { app } from '../firebase';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import Cookies from 'js-cookie'
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -141,6 +142,7 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = Cookies.get("access_token")
     try {
       if (formData.imageUrls.length < 1)
         return setError('You must upload at least one image');
@@ -152,6 +154,7 @@ export default function CreateListing() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...formData,

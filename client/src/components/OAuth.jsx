@@ -3,6 +3,7 @@ import { app } from '../firebase';
 import { useDispatch } from 'react-redux';
 import { signInSuccess } from '../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie'
 
 export default function OAuth() {
   const dispatch = useDispatch();
@@ -26,7 +27,8 @@ export default function OAuth() {
         }),
       });
       const data = await res.json();
-      dispatch(signInSuccess(data));
+      Cookies.set('access_token', data.token)
+      dispatch(signInSuccess(data.user));
       navigate('/');
     } catch (error) {
       console.log('could not sign in with google', error);

@@ -18,6 +18,8 @@ import {
 } from '../redux/user/userSlice';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie'
+
 export default function Profile() {
   const fileRef = useRef(null);
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -74,10 +76,12 @@ export default function Profile() {
     e.preventDefault();
     try {
       dispatch(updateUserStart());
+      const token = Cookies.get("access_token")
       const res = await fetch(`https://real-estate-gxtg.onrender.com/api/user/update/${currentUser._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -97,8 +101,12 @@ export default function Profile() {
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
+      const token = Cookies.get("access_token")
       const res = await fetch(`https://real-estate-gxtg.onrender.com/api/user/delete/${currentUser._id}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       const data = await res.json();
       if (data.success === false) {
@@ -121,6 +129,7 @@ export default function Profile() {
         return;
       }
       dispatch(deleteUserSuccess(data));
+      Cookies.remove('access_token')
     } catch (error) {
       dispatch(deleteUserFailure(data.message));
     }
@@ -129,7 +138,13 @@ export default function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingsError(false);
-      const res = await fetch(`https://real-estate-gxtg.onrender.com/api/user/listings/${currentUser._id}`);
+      const token = Cookies.get("access_token")
+      const res = await fetch(`https://real-estate-gxtg.onrender.com/api/user/listings/${currentUser._id}`,{
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
       if (data.success === false) {
         setShowListingsError(true);
@@ -143,9 +158,13 @@ export default function Profile() {
   };
 
   const handleListingDelete = async (listingId) => {
+    const token = Cookies.get("access_token")
     try {
       const res = await fetch(`https://real-estate-gxtg.onrender.com/api/listing/delete/${listingId}`, {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       const data = await res.json();
       if (data.success === false) {
@@ -160,6 +179,7 @@ export default function Profile() {
       console.log(error.message);
     }
   };
+  console.log(currentUser)
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>

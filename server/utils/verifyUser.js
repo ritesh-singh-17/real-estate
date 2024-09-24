@@ -1,15 +1,33 @@
 import jwt from 'jsonwebtoken';
-import { errorHandler } from './error.js';
 
-export const verifyToken = (req, res, next) => {
-  const token = req.cookies.access_token;
+export const verifyToken = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
 
-  if (!token) return next(errorHandler(401, 'Unauthorized'));
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        message: 'User is unauthenticated. Please login',
+        success: false
+      });
+    }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return next(errorHandler(403, 'Forbidden'));
-
-    req.user = user;
+    const token = authHeader.split(' ')[1];
+    if (!token || token === "undefined") {
+      return res.status(401).json({
+        message: "User is unauthenticated. Please login",
+        success: false
+      })
+    }
+    const decode = await jwt.verify(token, process.env.JWT_SECRET);
+    if (!decode) {
+      return res.status(401).json({
+        message: "Invalid token",
+        success: false
+      })
+    };
+    req.userId = decode.id;
     next();
-  });
+  } catch (error) {
+    console.log(error);
+  }
 };

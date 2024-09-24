@@ -6,6 +6,7 @@ import authRouter from './routes/auth.route.js';
 import listingRouter from './routes/listing.route.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
+
 dotenv.config();
 
 mongoose
@@ -14,7 +15,7 @@ mongoose
     console.log('Connected to MongoDB!');
   })
   .catch((err) => {
-    console.log(err);
+    console.log("Error in connecting to MongoDB: ",err);
   });
 
 const app = express();
@@ -22,9 +23,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
-
 const corsOptions = {
-  origin:'https://real-estate-r.vercel.app/',
+  origin:'https://real-estate-r.vercel.app',
+  // origin:'http://localhost:5173',
   credentials:true
 }
 
